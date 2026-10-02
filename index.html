@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peace - Para kay Maee</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0b0b0f;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Zoomed-out Code Editor Background (100+ lines aesthetic view) */
+        .code-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            font-size: 9.5px;
+            line-height: 1.35;
+            color: rgba(255, 255, 255, 0.16);
+            pointer-events: none;
+            z-index: 0;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .comment { color: #6a9955; }
+        .number { color: #b5cea8; }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 11, 15, 0.94);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 25px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .apology-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 30, 66, 0.5);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .click-btn {
+            background: linear-gradient(135deg, #ff1e42 0%, #b3002d 100%);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 30, 66, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .click-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 15px 40px rgba(255, 30, 66, 0.7);
+        }
+
+        /* Active Floating Lyric Cards with Typewriter Cursor */
+        .lyrics-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 85%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .lyric-card {
+            position: absolute;
+            background: rgba(15, 15, 20, 0.92);
+            border: 1px solid #ff1e42;
+            padding: 14px 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 22px rgba(255, 30, 66, 0.4);
+            color: #ffffff;
+            font-size: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            max-width: 350px;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .lyric-card.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Blinking Typewriter Cursor Effect */
+        .lyric-card.show::after {
+            content: '_';
+            animation: blink 0.7s infinite;
+            color: #ff1e42;
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Floating Musical Notes & Sparkles */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .float-item {
+            position: absolute;
+            color: rgba(255, 30, 66, 0.45);
+            font-size: 16px;
+            animation: floatUp 4s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.85; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Terminal Footer */
+        .terminal {
+            background: #050508;
+            border-top: 1px solid #222;
+            padding: 8px 15px;
+            font-size: 11px;
+            color: #888;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .terminal span {
+            color: #ff1e42;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="apology-text">Sorry na, Maee 🥺</div>
+        <button class="click-btn" id="clickItBtn">Click it ✨</button>
+    </div>
+
+    <!-- 100+ Lines Aesthetic Code Background -->
+    <div class="code-bg" id="codeBg">
+<span class="keyword">import</span> sys
+<span class="keyword">import</span> time
+<span class="keyword">import</span> random
+<span class="keyword">import</span> os
+<span class="keyword">import</span> math
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+<span class="keyword">from</span> PyQt5 <span class="keyword">import</span> QtWidgets, QtCore, QtGui
+
+<span class="comment"># ==========================================</span>
+<span class="comment"># PROJECT: Emotional Recovery & Audio Sync</span>
+<span class="comment"># TARGET: Maee (Peace Protocol v2.5)</span>
+<span class="comment"># ==========================================</span>
+
+<span class="keyword">class</span> <span class="function">SystemBootloader</span>(QtCore.QObject):
+    progress_updated = QtCore.pyqtSignal(<span class="keyword">int</span>)
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        <span class="keyword">super</span>().__init__()
+        self.status = <span class="string">"Initializing core modules..."</span>
+        self.latency = <span class="number">0.014</span>
+        
+    <span class="keyword">def</span> <span class="function">execute_sequence</span>(self):
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="number">101</span>):
+            time.sleep(self.latency)
+            self.progress_updated.emit(i)
+        print(<span class="string">"[OK] Bootloader sequence completed successfully."</span>)
+
+<span class="keyword">class</span> <span class="function">MatrixGrid</span>(QtWidgets.QWidget):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, parent=<span class="keyword">None</span>):
+        <span class="keyword">super</span>().__init__(parent)
+        self.grid_size = <span class="number">32</span>
+        self.nodes = []
+        self.initialize_matrix()
+
+    <span class="keyword">def</span> <span class="function">initialize_matrix</span>(self):
+        <span class="keyword">for</span> x <span class="keyword">in</span> <span class="function">range</span>(self.grid_size):
+            row = []
+            <span class="keyword">for</span> y <span class="keyword">in</span> <span class="function">range</span>(self.grid_size):
+                node_val = random.choice([<span class="number">0</span>, <span class="number">1</span>])
+                row.append(node_val)
+            self.nodes.append(row)
+
+    <span class="keyword">def</span> <span class="function">render_grid</span>(self, painter):
+        pen = QtGui.QPen(QtGui.QColor(<span class="number">255</span>, <span class="number">30</span>, <span class="number">66</span>, <span class="number">45</span>))
+        painter.setPen(pen)
+        <span class="keyword">for</span> x <span class="keyword">in</span> <span class="function">range</span>(self.grid_size):
+            <span class="keyword">for</span> y <span class="keyword">in</span> <span class="function">range</span>(self.grid_size):
+                <span class="keyword">if</span> self.nodes[x][y] == <span class="number">1</span>:
+                    painter.drawPoint(x * <span class="number">10</span>, y * <span class="number">10</span>)
+
+<span class="keyword">class</span> <span class="function">DarkCard</span>(QtWidgets.QWidget):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, parent, text, x, y):
+        <span class="keyword">super</span>().__init__(parent)
+        self.setGeometry(x, y, <span class="number">320</span>, <span class="number">65</span>)
+        self.setStyleSheet(<span class="string">"background: #0f0f14; border: 1px solid #ff1e42; color: #ffffff;"</span>)
+        self.opacity_val = <span class="number">0.0</span>
+        
+    <span class="keyword">def</span> <span class="function">fadeIn</span>(self):
+        self.opacity_val = <span class="function">min</span>(<span class="number">1.0</span>, self.opacity_val + <span class="number">0.1</span>)
+        self.update()
+
+<span class="keyword">class</span> <span class="function">AudioVisualizer</span>(QtCore.QThread):
+    frequency_signal = QtCore.pyqtSignal(<span class="function">list</span>)
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        <span class="keyword">super</span>().__init__()
+        self.active = <span class="keyword">True</span>
+
+    <span class="keyword">def</span> <span class="function">run</span>(self):
+        <span class="keyword">while</span> self.active:
+            spectrum = [random.uniform(<span class="number">20.0</span>, <span class="number">20000.0</span>) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="number">16</span>)]
+            self.frequency_signal.emit(spectrum)
+            self.msleep(<span class="number">50</span>)
+
+<span class="keyword">class</span> <span class="function">CoreEngine</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, target_name):
+        self.target = target_name
+        self.version = <span class="string">"v2.5.4-stable"</span>
+        self.timestamp = datetime.now()
+        
+    <span class="keyword">def</span> <span class="function">compile_assets</span>(self):
+        print(<span class="string">f"[{self.timestamp}] Compiling UI shaders..."</span>)
+        print(<span class="string">f"[{self.timestamp}] Linking secure audio buffers..."</span>)
+        print(<span class="string">f"[{self.timestamp}] Target locked: {self.target}"</span>)
+        <span class="keyword">return</span> <span class="keyword">True</span>
+
+<span class="keyword">def</span> <span class="function">run_diagnostics</span>():
+    metrics = {<span class="string">"CPU"</span>: <span class="number">12.4</span>, <span class="string">"RAM"</span>: <span class="number">42.1</span>, <span class="string">"GPU"</span>: <span class="number">68.9</span>}
+    <span class="keyword">for</span> key, val <span class="keyword">in</span> metrics.items():
+        print(<span class="string">f"Diagnostic check [{key}]: {val}% - Status OK"</span>)
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    app = QtWidgets.QApplication(sys.argv)
+    engine = CoreEngine(<span class="string">"Maee"</span>)
+    engine.compile_assets()
+    run_diagnostics()
+    
+    bootloader = SystemBootloader()
+    bootloader.execute_sequence()
+    
+    window = QtWidgets.QMainWindow()
+    window.setWindowTitle(<span class="string">"Peace Protocol - Active"</span>)
+    window.resize(<span class="number">1280</span>, <span class="number">720</span>)
+    
+    grid = MatrixGrid(window)
+    grid.show()
+    
+    print(<span class="string">"System running smoothly. Waiting for user interaction..."</span>)
+    sys.exit(app.exec_())
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    main()
+    </div>
+
+    <!-- Floating Lyrics Pop-up Cards -->
+    <div class="lyrics-container" id="lyricsContainer">
+        <div class="lyric-card" id="card-0" style="top: 18%; left: 8%;"></div>
+        <div class="lyric-card" id="card-1" style="top: 38%; right: 8%;"></div>
+        <div class="lyric-card" id="card-2" style="top: 58%; left: 10%;"></div>
+        <div class="lyric-card" id="card-3" style="top: 22%; right: 12%;"></div>
+    </div>
+
+    <!-- Floating Music Notes / Sparkles -->
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <!-- Terminal Footer -->
+    <div class="terminal">
+        <div><span>Terminal</span> ~ python3 audio_lyrics.py</div>
+        <div id="statusText">Status: Waiting for click...</div>
+    </div>
+
+    <audio id="audioPlayer" src="song.mp3" loop></audio>
+
+    <script>
+        const clickItBtn = document.getElementById('clickItBtn');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const statusText = document.getElementById('statusText');
+        const floatingElements = document.getElementById('floatingElements');
+
+        /* Word-by-word precise timestamps mapping */
+        const wordsData = [
+            { word: "When", start: 0, end: 0.5, line_index: 0 },
+            { word: "the", start: 0.5, end: 0.841, line_index: 0 },
+            { word: "light", start: 0.841, end: 2.74, line_index: 0 },
+            { word: "disappears", start: 2.74, end: 5.73, line_index: 0 },
+            { word: "And", start: 6.07, end: 6.504, line_index: 1 },
+            { word: "when", start: 6.504, end: 6.904, line_index: 1 },
+            { word: "this", start: 6.904, end: 7.328, line_index: 1 },
+            { word: "world's", start: 7.328, end: 9.24, line_index: 1 },
+            { word: "insincere", start: 9.53, end: 11.672, line_index: 1 },
+            { word: "you'll", start: 11.672, end: 12.152, line_index: 1 },
+            { word: "be", "start": 12.152, "end": 12.664, "line_index": 1 },
+            { word: "safe", "start": 12.664, "end": 13.38, "line_index": 1 },
+            { word: "here", "start": 13.38, "end": 15.41, "line_index": 1 },
+            { word: "When", "start": 15.65, "end": 16.09, "line_index": 2 },
+            { word: "nobody", "start": 16.09, "end": 17.9, "line_index": 2 },
+            { word: "hears", "start": 18.889, "end": 19.36, "line_index": 2 },
+            { word: "you", "start": 19.36, "end": 19.58, "line_index": 2 },
+            { word: "scream", "start": 19.58, "end": 21.95, "line_index": 2 },
+            { word: "And", "start": 21.95, "end": 22.436, "line_index": 3 },
+            { word: "I'll", "start": 22.436, "end": 22.792, "line_index": 3 },
+            { word: "scream", "start": 22.792, "end": 23.316, "line_index": 3 },
+            { word: "with", "start": 23.316, "end": 23.672, "line_index": 3 },
+            { word: "you", "start": 23.672, "end": 24.36, "line_index": 3 },
+            { word: "you'll", "start": 24.45, "end": 24.916, "line_index": 3 },
+            { word: "be", "start": 24.916, "end": 25.39, "line_index": 3 },
+            { word: "safe", "start": 25.39, "end": 26.24, "line_index": 3 },
+            { word: "here", "start": 26.24, "end": 30.15, "line_index": 3 }
+        ];
+
+        clickItBtn.addEventListener('click', () => {
+            audioPlayer.play().then(() => {
+                welcomeScreen.style.display = 'none';
+                statusText.textContent = "Status: Running visualizer with sound... 🎵";
+                startFloatingIcons();
+            }).catch(e => {
+                alert("Tiyaking na-upload ang song.mp3 file sa GitHub repository.");
+            });
+        });
+
+        function startFloatingIcons() {
+            setInterval(() => {
+                if (audioPlayer.paused) return;
+                const icons = ['♪', '♫', '♥', '✨', '✦'];
+                const el = document.createElement('div');
+                el.className = 'float-item';
+                el.style.left = Math.random() * 90 + 'vw';
+                el.style.fontSize = (Math.random() * 10 + 14) + 'px';
+                el.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                el.textContent = icons[Math.floor(Math.random() * icons.length)];
+                floatingElements.appendChild(el);
+
+                setTimeout(() => {
+                    el.remove();
+                }, 4000);
+            }, 600);
+        }
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            const currentTime = audioPlayer.currentTime;
+
+            for (let i = 0; i < 4; i++) {
+                const card = document.getElementById(`card-${i}`);
+                const lineWords = wordsData.filter(w => w.line_index === i);
+                
+                if (lineWords.length === 0) continue;
+
+                const lineStart = lineWords[0].start;
+                const lineEnd = lineWords[lineWords.length - 1].end;
+
+                if (currentTime >= lineStart && currentTime <= lineEnd + 0.8) {
+                    card.classList.add('show');
+                    // I-pakita lamang ang mga salitang umabot na sa timestamp nila (word-by-word)
+                    const visibleWords = lineWords.filter(w => currentTime >= w.start);
+                    card.textContent = visibleWords.map(w => w.word).join(' ');
+                } else {
+                    card.classList.remove('show');
+                    card.textContent = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
